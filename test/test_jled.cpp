@@ -213,12 +213,14 @@ TEST_CASE("FadeOffEvaluator evaluates to expected brightness curve", "[jled]") {
 }
 
 TEST_CASE(
-    "BreatheEvaluator evaluates to flattened bell curve distributed brightness curve",
+    "BreatheEvaluator evaluates to flattened bell curve distributed brightness "
+    "curve",
     "[jled]") {
     const auto eval = BreatheBrightnessEvaluator(1000, 2000, 500);
-    REQUIRE(1000+2000+500 == eval.Period());
+    REQUIRE(1000 + 2000 + 500 == eval.Period());
     const std::map<uint32_t, uint8_t> test_values = {
-        {0, 0}, {500, 68}, {1000, 255}, {2000, 255}, {3000, 255}, {3250, 68}, {3499, 0}, {3500, 0}};
+        {0, 0},      {500, 68},  {1000, 255}, {2000, 255},
+        {3000, 255}, {3250, 68}, {3499, 0},   {3500, 0}};
 
     for (const auto &x : test_values) {
         REQUIRE((int)x.second == (int)eval.Eval(x.first));
@@ -393,26 +395,28 @@ TEST_CASE("Update returns true while updating, else false", "[jled]") {
     REQUIRE_FALSE(jled.Update());
 }
 
-TEST_CASE("UpdateAndFinally triggers the callback once on the last iteration", "[jled]") {
+TEST_CASE("UpdateAndFinally triggers the callback once on the last iteration",
+          "[jled]") {
     TestJLed jled = TestJLed(10).Blink(1, 1);
 
     int cbCalled = 0;
-    auto cb = [] (TestJLed&, void* p) {
+    auto cb = [](TestJLed &, void *p) {
         // gets &cbCalled passed in as void* p
-        (*(int*)p)++;
+        int *pCbCalled = (static_cast<int*>(p));
+        (*pCbCalled)++;
     };
 
     jled.Hal().SetMillis(0);
     REQUIRE(jled.UpdateAndFinally(cb, &cbCalled));
-    REQUIRE( cbCalled == 0 );
+    REQUIRE(cbCalled == 0);
 
     jled.Hal().SetMillis(1);
     REQUIRE(!jled.UpdateAndFinally(cb, &cbCalled));
-    REQUIRE( cbCalled == 1 );
+    REQUIRE(cbCalled == 1);
 
     jled.Hal().SetMillis(2);
     REQUIRE(!jled.UpdateAndFinally(cb, &cbCalled));
-    REQUIRE( cbCalled == 1 );
+    REQUIRE(cbCalled == 1);
 }
 
 TEST_CASE("After Reset() the effect can be restarted", "[jled]") {
@@ -424,7 +428,7 @@ TEST_CASE("After Reset() the effect can be restarted", "[jled]") {
     jled.Blink(1, 2);
     constexpr p expected[]{p{true, 255}, p{true, 0}, p{false, 0}, p{false, 0}};
 
-    for (const auto& x : expected) {
+    for (const auto &x : expected) {
         jled.Hal().SetMillis(time++);
         REQUIRE(x.first == jled.Update());
         REQUIRE(x.second == jled.Hal().Value());
@@ -432,7 +436,7 @@ TEST_CASE("After Reset() the effect can be restarted", "[jled]") {
 
     // after Reset() effect starts over
     jled.Reset();
-    for (const auto& x : expected) {
+    for (const auto &x : expected) {
         jled.Hal().SetMillis(time++);
         REQUIRE(x.first == jled.Update());
         REQUIRE(x.second == jled.Hal().Value());
@@ -449,7 +453,7 @@ TEST_CASE("Changing the effect resets object and starts over", "[jled]") {
     constexpr p expected_blink[]{p{true, 255}, p{true, 0}, p{false, 0},
                                  p{false, 0}};
 
-    for (const auto& x : expected_blink) {
+    for (const auto &x : expected_blink) {
         jled.Hal().SetMillis(time++);
         REQUIRE(x.first == jled.Update());
         REQUIRE(x.second == jled.Hal().Value());
@@ -562,4 +566,3 @@ TEST_CASE("scaling a value with factor 31 returns original value", "[scale5]") {
     REQUIRE(127 == jled::scale5(127, 31));
     REQUIRE(255 == jled::scale5(255, 31));
 }
-
