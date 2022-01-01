@@ -204,8 +204,10 @@ class TJLed {
     BrightnessEvaluator* brightness_eval_ = nullptr;
     // Hardware abstraction giving access to the MCU
     HalType hal_;
+    uint8_t val_cur;
 
     void Write(uint8_t val) {
+        val_cur = val;
         val = scale5(val, maxBrightness_);
         hal_.analogWrite(IsLowActive() ? kFullBrightness - val : val);
     }
@@ -260,7 +262,7 @@ class TJLed {
 
     bool IsLowActive() const { return bLowActive_; }
 
-    uint32_t Get() { return brightness_eval_->Eval; }
+    uint8_t Get() { return val_cur; }
 
     // turn LED on
     B& On() { return Set(kFullBrightness); }
