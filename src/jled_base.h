@@ -260,7 +260,7 @@ class TJLed {
 
     bool IsLowActive() const { return bLowActive_; }
 
-    uint8_t Get() { return brightness_eval_->Eval; }
+    uint32_t Get() { return brightness_eval_->Eval; }
 
     // turn LED on
     B& On() { return Set(kFullBrightness); }
