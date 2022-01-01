@@ -260,6 +260,8 @@ class TJLed {
 
     bool IsLowActive() const { return bLowActive_; }
 
+    int Get() const { return brightness_eval_buf_; }
+
     // turn LED on
     B& On() { return Set(kFullBrightness); }
 
